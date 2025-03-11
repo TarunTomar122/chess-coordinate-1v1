@@ -34,6 +34,26 @@
             position: relative;
             border: 5px solid #8B4513;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            transition: box-shadow 0.3s ease;
+        }
+        .active-turn {
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.8), 0 0 30px rgba(52, 211, 153, 0.6) !important;
+            animation: pulse 2s infinite;
+        }
+        .inactive-turn {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
+            animation: none;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 20px rgba(52, 211, 153, 0.8), 0 0 30px rgba(52, 211, 153, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(52, 211, 153, 0.9), 0 0 40px rgba(52, 211, 153, 0.7);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(52, 211, 153, 0.8), 0 0 30px rgba(52, 211, 153, 0.6);
+            }
         }
         #target-square {
             position: absolute;

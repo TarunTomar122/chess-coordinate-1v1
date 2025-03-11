@@ -189,14 +189,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateTurnHighlight() {
+        const chessboard = document.getElementById('chessboard');
+        
         if (gameState.isPlayerTurn) {
             playerNameDisplay.classList.add('text-yellow-300');
             opponentNameDisplay.classList.remove('text-yellow-300');
             currentPlayerDisplay.textContent = gameState.playerName;
+            
+            // Add active-turn class to the chessboard when it's the player's turn
+            chessboard.classList.add('active-turn');
+            chessboard.classList.remove('inactive-turn');
+            
+            // Also add a pulsing animation to make it more noticeable
+            showToast("It's your turn!", 2000);
         } else {
             playerNameDisplay.classList.remove('text-yellow-300');
             opponentNameDisplay.classList.add('text-yellow-300');
             currentPlayerDisplay.textContent = gameState.opponentName;
+            
+            // Add inactive-turn class when it's not the player's turn
+            chessboard.classList.remove('active-turn');
+            chessboard.classList.add('inactive-turn');
         }
     }
     

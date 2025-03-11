@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Training</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="multiplayer.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chess-square {
+            width: 12.5%;
+            height: 12.5%;
+            float: left;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        .chess-square:hover {
+            opacity: 0.8;
+            cursor: pointer;
+        }
+        .chess-square.correct {
+            background-color: #4CAF50 !important;
+        }
+        .chess-square.wrong {
+            background-color: #f44336 !important;
+        }
+        #chessboard {
+            width: 80vmin;
+            height: 80vmin;
+            max-width: 600px;
+            max-height: 600px;
+            margin: auto;
+            position: relative;
+            border: 5px solid #8B4513;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        #target-square {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #target-notation {
+            font-size: 8rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        @media (max-width: 640px) {
+            #target-notation {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Login Screen -->
+    <div id="login-screen" class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-8 shadow-lg">
+            <h1 class="text-3xl font-bold mb-6 text-center">Coordinate Training</h1>
+            <div class="space-y-4">
+                <input type="text" id="player-name" placeholder="Enter your name" 
+                       class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500">
+                <input type="text" id="room-name" placeholder="Enter room name" 
+                       class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500">
+                <button id="find-game-btn" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Join Room
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div id="waiting-screen" class="hidden container mx-auto px-4 py-8 text-center">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-8 shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Waiting for opponent...</h2>
+            <div class="text-lg mb-4">Room: <span id="waiting-room-name" class="font-bold text-blue-400"></span></div>
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-4">
+                    <button id="back-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Leave Game
+                    </button>
+                    <div>
+                        <span id="player-name-display" class="font-bold"></span>
+                        <span class="text-sm">(Score: <span id="player-score">0</span>)</span>
+                    </div>
+                    <div>vs</div>
+                    <div>
+                        <span id="opponent-name-display" class="font-bold"></span>
+                        <span class="text-sm">(Score: <span id="opponent-score">0</span>)</span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg">Current Turn: <span id="current-player" class="font-bold"></span></div>
+                    <div class="text-lg">Target Square: <span id="target-display" class="font-bold text-yellow-300"></span></div>
+                    <div class="text-xs text-gray-400 mt-1">Faster answers = more points (max 5 points per correct answer)</div>
+                </div>
+            </div>
+            
+            <div id="chessboard" class="mx-auto"></div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="hidden container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-8 shadow-lg text-center">
+            <h2 class="text-2xl font-bold mb-4" id="winner-display"></h2>
+            <div class="mb-6">
+                <div class="mb-2">
+                    <span id="final-player-name" class="font-bold"></span>: 
+                    <span id="final-player-score"></span>
+                </div>
+                <div>
+                    <span id="final-opponent-name" class="font-bold"></span>: 
+                    <span id="final-opponent-score"></span>
+                </div>
+            </div>
+            <button id="play-again-btn" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Toast -->
+    <div id="status-toast" class="hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg">
+        <span id="status-message"></span>
+    </div>
+</body>
+</html> 

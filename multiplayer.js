@@ -127,32 +127,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 }
                 
-                // Update turn display
-                if (gameState.isPlayerTurn) {
-                    playerNameDisplay.classList.add('text-yellow-300');
-                    opponentNameDisplay.classList.remove('text-yellow-300');
-                    currentPlayerDisplay.textContent = gameState.playerName;
-                } else {
-                    playerNameDisplay.classList.remove('text-yellow-300');
-                    opponentNameDisplay.classList.add('text-yellow-300');
-                    currentPlayerDisplay.textContent = gameState.opponentName;
-                }
+                // Update turn display and highlighting
+                updateTurnHighlight();
                 
-                // Show appropriate message based on the move result
-                if (moveResult.correct) {
-                    if (moveResult.player === gameState.playerName) {
-                        showToast(`Correct! +${moveResult.pointsEarned} points. Your opponent's turn`);
-                    } else {
-                        showToast(`${moveResult.player} found the correct square! +${moveResult.pointsEarned} points. Your turn`);
-                    }
+                // Show toast notification for turn change
+                if (gameState.isPlayerTurn) {
+                    showToast("It's your turn!", 2000);
                 } else {
-                    if (moveResult.player === gameState.playerName) {
-                        showToast('Wrong square. Your opponent\'s turn');
-                    } else {
-                        showToast(`${moveResult.player} clicked the wrong square! Your turn`);
-                    }
+                    showToast(`It's ${gameState.opponentName}'s turn`, 2000);
                 }
             });
+            
+            // Show appropriate message based on the move result
+            if (moveResult.correct) {
+                if (moveResult.player === gameState.playerName) {
+                    showToast(`Correct! +${moveResult.pointsEarned} points. Your opponent's turn`);
+                } else {
+                    showToast(`${moveResult.player} found the correct square! +${moveResult.pointsEarned} points. Your turn`);
+                }
+            } else {
+                if (moveResult.player === gameState.playerName) {
+                    showToast('Wrong square. Your opponent\'s turn');
+                } else {
+                    showToast(`${moveResult.player} clicked the wrong square! Your turn`);
+                }
+            }
         });
         
         socket.on('notYourTurn', () => {
@@ -199,9 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add active-turn class to the chessboard when it's the player's turn
             chessboard.classList.add('active-turn');
             chessboard.classList.remove('inactive-turn');
-            
-            // Also add a pulsing animation to make it more noticeable
-            showToast("It's your turn!", 2000);
         } else {
             playerNameDisplay.classList.remove('text-yellow-300');
             opponentNameDisplay.classList.add('text-yellow-300');
